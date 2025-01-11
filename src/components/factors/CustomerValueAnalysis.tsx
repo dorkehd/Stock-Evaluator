@@ -3,44 +3,67 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface CustomerValueMetric {
-  name: string;
-  description: string;
-  weight: number;
-}
-
 interface Props {
   score: number;
   onScoreChange: (score: number) => void;
 }
 
-const CustomerValueAnalysis = ({ score, onScoreChange }: Props) => {
-  const metrics: CustomerValueMetric[] = [
-    {
-      name: 'Brand Recognition',
-      description: 'Evaluate the company\'s brand strength and recognition in its market',
-      weight: 25
-    },
-    {
-      name: 'Customer Satisfaction',
-      description: 'Assess customer satisfaction levels and retention rates',
-      weight: 25
-    },
-    {
-      name: 'Net Promoter Score',
-      description: 'Consider the company\'s NPS and customer loyalty metrics',
-      weight: 25
-    },
-    {
-      name: 'Pricing Power',
-      description: 'Evaluate the company\'s ability to maintain or increase prices',
-      weight: 25
-    }
-  ];
+interface Metric {
+  name: string;
+  weight: number;
+  description: string;
+  key: string;
+}
 
-  const handleMetricScore = (metricScore: number, weight: number) => {
-    const weightedScore = (metricScore * weight) / 100;
-    onScoreChange(weightedScore);
+const metrics: Metric[] = [
+  {
+    name: 'Brand Recognition',
+    weight: 0.25,
+    description: 'How strong is the company\'s brand identity and recognition?',
+    key: 'brand'
+  },
+  {
+    name: 'Customer Satisfaction',
+    weight: 0.25,
+    description: 'Are customers happy with the product/service quality?',
+    key: 'satisfaction'
+  },
+  {
+    name: 'Net Promoter Score',
+    weight: 0.25,
+    description: 'What is the likelihood customers will recommend the product?',
+    key: 'nps'
+  },
+  {
+    name: 'Pricing Power',
+    weight: 0.25,
+    description: 'Can the company increase prices without losing customers?',
+    key: 'pricing'
+  }
+];
+
+const CustomerValueAnalysis = ({ score, onScoreChange }: Props) => {
+  const [metricScores, setMetricScores] = React.useState<Record<string, number>>({
+    brand: 0,
+    satisfaction: 0,
+    nps: 0,
+    pricing: 0
+  });
+
+  const handleMetricChange = (metric: string, value: number) => {
+    const newScores = {
+      ...metricScores,
+      [metric]: value
+    };
+    setMetricScores(newScores);
+    
+    // Calculate total weighted score
+    const totalScore = Object.entries(newScores).reduce((total, [key, score]) => {
+      const metricWeight = metrics.find(m => m.key === key)?.weight || 0;
+      return total + (score * metricWeight);
+    }, 0);
+    
+    onScoreChange(totalScore);
   };
 
   return (
@@ -51,21 +74,25 @@ const CustomerValueAnalysis = ({ score, onScoreChange }: Props) => {
       <CardContent>
         <div className="space-y-6">
           {metrics.map((metric) => (
-            <div key={metric.name} className="space-y-2">
-              <Label className="text-base font-semibold">
-                {metric.name} ({metric.weight}%)
-              </Label>
+            <div key={metric.key} className="space-y-2">
+              <div className="flex justify-between">
+                <Label>{metric.name} ({metric.weight * 100}%)</Label>
+                <span className="text-sm text-gray-500">
+                  Score: {metricScores[metric.key]}
+                </span>
+              </div>
               <p className="text-sm text-gray-500">{metric.description}</p>
-              <div className="flex items-center gap-4">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="Score (0-100)"
-                  onChange={(e) => handleMetricScore(Number(e.target.value), metric.weight)}
-                  className="w-32"
-                />
-                <span className="text-sm text-gray-500">Score out of 100</span>
+              <Input
+                type="range"
+                min="0"
+                max="100"
+                value={metricScores[metric.key]}
+                onChange={(e) => handleMetricChange(metric.key, Number(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Poor</span>
+                <span>Excellent</span>
               </div>
             </div>
           ))}

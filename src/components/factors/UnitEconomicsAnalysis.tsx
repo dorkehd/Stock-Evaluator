@@ -3,48 +3,67 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface UnitEconomicsMetric {
-  name: string;
-  description: string;
-  weight: number;
-}
-
 interface Props {
   score: number;
   onScoreChange: (score: number) => void;
-  financialData?: {
-    grossMargin?: number;
-    operatingMargin?: number;
-  };
 }
 
-const UnitEconomicsAnalysis = ({ score, onScoreChange, financialData }: Props) => {
-  const metrics: UnitEconomicsMetric[] = [
-    {
-      name: 'Gross Margins',
-      description: 'Evaluate the company\'s gross profit margins and trends',
-      weight: 30
-    },
-    {
-      name: 'Operating Margins',
-      description: 'Assess operating efficiency and profit margins',
-      weight: 30
-    },
-    {
-      name: 'Scale Economics',
-      description: 'Consider how unit economics improve with scale',
-      weight: 20
-    },
-    {
-      name: 'Cost Structure',
-      description: 'Analyze fixed vs variable costs and cost management',
-      weight: 20
-    }
-  ];
+interface Metric {
+  name: string;
+  weight: number;
+  description: string;
+  key: string;
+}
 
-  const handleMetricScore = (metricScore: number, weight: number) => {
-    const weightedScore = (metricScore * weight) / 100;
-    onScoreChange(weightedScore);
+const metrics: Metric[] = [
+  {
+    name: 'Gross Margins',
+    weight: 0.30,
+    description: 'How profitable is each unit sold before operating expenses?',
+    key: 'grossMargin'
+  },
+  {
+    name: 'Operating Margins',
+    weight: 0.30,
+    description: 'How efficient is the company at managing operating costs?',
+    key: 'operatingMargin'
+  },
+  {
+    name: 'Scale Economics',
+    weight: 0.20,
+    description: 'Does unit profitability improve with scale?',
+    key: 'scale'
+  },
+  {
+    name: 'Cost Structure',
+    weight: 0.20,
+    description: 'How favorable is the fixed vs variable cost ratio?',
+    key: 'costs'
+  }
+];
+
+const UnitEconomicsAnalysis = ({ score, onScoreChange }: Props) => {
+  const [metricScores, setMetricScores] = React.useState<Record<string, number>>({
+    grossMargin: 0,
+    operatingMargin: 0,
+    scale: 0,
+    costs: 0
+  });
+
+  const handleMetricChange = (metric: string, value: number) => {
+    const newScores = {
+      ...metricScores,
+      [metric]: value
+    };
+    setMetricScores(newScores);
+    
+    // Calculate total weighted score
+    const totalScore = Object.entries(newScores).reduce((total, [key, score]) => {
+      const metricWeight = metrics.find(m => m.key === key)?.weight || 0;
+      return total + (score * metricWeight);
+    }, 0);
+    
+    onScoreChange(totalScore);
   };
 
   return (
@@ -53,30 +72,27 @@ const UnitEconomicsAnalysis = ({ score, onScoreChange, financialData }: Props) =
         <CardTitle>Unit Economics Analysis</CardTitle>
       </CardHeader>
       <CardContent>
-        {financialData && (
-          <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <p className="font-medium">Financial Metrics:</p>
-            <p>Gross Margin: {financialData.grossMargin?.toFixed(2)}%</p>
-            <p>Operating Margin: {financialData.operatingMargin?.toFixed(2)}%</p>
-          </div>
-        )}
         <div className="space-y-6">
           {metrics.map((metric) => (
-            <div key={metric.name} className="space-y-2">
-              <Label className="text-base font-semibold">
-                {metric.name} ({metric.weight}%)
-              </Label>
+            <div key={metric.key} className="space-y-2">
+              <div className="flex justify-between">
+                <Label>{metric.name} ({metric.weight * 100}%)</Label>
+                <span className="text-sm text-gray-500">
+                  Score: {metricScores[metric.key]}
+                </span>
+              </div>
               <p className="text-sm text-gray-500">{metric.description}</p>
-              <div className="flex items-center gap-4">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="Score (0-100)"
-                  onChange={(e) => handleMetricScore(Number(e.target.value), metric.weight)}
-                  className="w-32"
-                />
-                <span className="text-sm text-gray-500">Score out of 100</span>
+              <Input
+                type="range"
+                min="0"
+                max="100"
+                value={metricScores[metric.key]}
+                onChange={(e) => handleMetricChange(metric.key, Number(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Poor</span>
+                <span>Excellent</span>
               </div>
             </div>
           ))}
