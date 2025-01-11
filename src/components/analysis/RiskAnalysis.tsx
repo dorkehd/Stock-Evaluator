@@ -1,45 +1,17 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { BaseAnalysis } from './BaseAnalysis';
+import { RISK_METRICS } from '@/constants/metrics';
 
 interface Props {
-  score: number;
-  onScoreChange: (score: number) => void;
+  onScoreUpdate: (score: number) => void;
 }
 
-const RiskAnalysis = ({ score, onScoreChange }: Props) => {
-  const riskFactors = [
-    'Market Risk',
-    'Financial Risk',
-    'Operational Risk',
-    'Regulatory Risk',
-    'Competition Risk'
-  ];
-
+export const RiskAnalysis = ({ onScoreUpdate }: Props) => {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Risk Analysis</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {riskFactors.map((factor, index) => (
-            <div key={index} className="space-y-2">
-              <label className="text-sm font-medium">{factor}</label>
-              <Input 
-                type="range" 
-                min="0" 
-                max="100" 
-                value={score} 
-                onChange={(e) => onScoreChange(Number(e.target.value))}
-                className="w-full"
-              />
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <BaseAnalysis
+      title="Risk Analysis"
+      metrics={RISK_METRICS}
+      onScoreUpdate={onScoreUpdate}
+    />
   );
 };
-
-export default RiskAnalysis;

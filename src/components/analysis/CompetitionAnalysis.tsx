@@ -1,16 +1,16 @@
 import React from 'react';
 import { BaseAnalysis } from './BaseAnalysis';
-import { MARKET_METRICS } from '@/constants/metrics';
+import { COMPETITION_METRICS } from '@/constants/metrics';
 
 interface Props {
   onScoreUpdate: (score: number) => void;
 }
 
-export const MarketAnalysis = ({ onScoreUpdate }: Props) => {
+export const CompetitionAnalysis = ({ onScoreUpdate }: Props) => {
   return (
     <BaseAnalysis
-      title="Market Analysis"
-      metrics={MARKET_METRICS}
+      title="Competition Analysis"
+      metrics={COMPETITION_METRICS}
       onScoreUpdate={onScoreUpdate}
     />
   );

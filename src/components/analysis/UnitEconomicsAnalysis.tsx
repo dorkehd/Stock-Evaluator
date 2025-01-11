@@ -1,17 +1,17 @@
 import React from 'react';
-import BaseAnalysis from './BaseAnalysis';
-import { unitEconomicsMetrics } from './config/metrics';
+import { BaseAnalysis } from './BaseAnalysis';
+import { UNIT_ECONOMICS_METRICS } from '@/constants/metrics';
 
 interface Props {
   onScoreUpdate: (score: number) => void;
 }
 
-const UnitEconomicsAnalysis = ({ onScoreUpdate }: Props) => (
-  <BaseAnalysis
-    title="Unit Economics Analysis"
-    metrics={unitEconomicsMetrics}
-    onScoreUpdate={onScoreUpdate}
-  />
-);
-
-export default UnitEconomicsAnalysis;
+export const UnitEconomicsAnalysis = ({ onScoreUpdate }: Props) => {
+  return (
+    <BaseAnalysis
+      title="Unit Economics Analysis"
+      metrics={UNIT_ECONOMICS_METRICS}
+      onScoreUpdate={onScoreUpdate}
+    />
+  );
+};
