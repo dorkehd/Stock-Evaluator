@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface Props {
   score: number;
@@ -12,88 +12,113 @@ interface Metric {
   name: string;
   weight: number;
   description: string;
-  key: string;
+  guidance: string[];
 }
 
 const metrics: Metric[] = [
   {
     name: 'Brand Recognition',
-    weight: 0.25,
-    description: 'How strong is the company\'s brand identity and recognition?',
-    key: 'brand'
+    weight: 25,
+    description: 'Measure of brand strength and consumer awareness',
+    guidance: [
+      'Consider market surveys and brand value rankings',
+      'Evaluate social media presence and engagement',
+      'Assess brand loyalty and repeat purchase rates'
+    ]
   },
   {
     name: 'Customer Satisfaction',
-    weight: 0.25,
-    description: 'Are customers happy with the product/service quality?',
-    key: 'satisfaction'
+    weight: 25,
+    description: 'Overall customer satisfaction with products/services',
+    guidance: [
+      'Review customer satisfaction surveys',
+      'Check online reviews and ratings',
+      'Analyze customer retention rates'
+    ]
   },
   {
     name: 'Net Promoter Score',
-    weight: 0.25,
-    description: 'What is the likelihood customers will recommend the product?',
-    key: 'nps'
+    weight: 25,
+    description: 'Likelihood of customers recommending the company',
+    guidance: [
+      'Compare NPS with industry averages',
+      'Track NPS trends over time',
+      'Consider regional variations in NPS'
+    ]
   },
   {
     name: 'Pricing Power',
-    weight: 0.25,
-    description: 'Can the company increase prices without losing customers?',
-    key: 'pricing'
+    weight: 25,
+    description: 'Ability to maintain or increase prices without losing customers',
+    guidance: [
+      'Analyze historical price increases',
+      'Evaluate customer response to price changes',
+      'Compare pricing with competitors'
+    ]
   }
 ];
 
 const CustomerValueAnalysis = ({ score, onScoreChange }: Props) => {
-  const [metricScores, setMetricScores] = React.useState<Record<string, number>>({
-    brand: 0,
-    satisfaction: 0,
-    nps: 0,
-    pricing: 0
-  });
+  const [metricScores, setMetricScores] = React.useState<Record<string, number>>({});
 
-  const handleMetricChange = (metric: string, value: number) => {
+  const handleMetricScore = (metricName: string, value: number) => {
     const newScores = {
       ...metricScores,
-      [metric]: value
+      [metricName]: value
     };
     setMetricScores(newScores);
-    
-    // Calculate total weighted score
-    const totalScore = Object.entries(newScores).reduce((total, [key, score]) => {
-      const metricWeight = metrics.find(m => m.key === key)?.weight || 0;
-      return total + (score * metricWeight);
+
+    // Calculate total score
+    const totalScore = metrics.reduce((acc, metric) => {
+      const metricScore = newScores[metric.name] || 0;
+      return acc + (metricScore * metric.weight / 100);
     }, 0);
-    
+
     onScoreChange(totalScore);
   };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Customer Value Analysis</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <span>Customer Value Analysis</span>
+          <span className="text-sm font-normal text-gray-500">
+            Overall Score: {score.toFixed(1)}/100
+          </span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           {metrics.map((metric) => (
-            <div key={metric.key} className="space-y-2">
-              <div className="flex justify-between">
-                <Label>{metric.name} ({metric.weight * 100}%)</Label>
+            <div key={metric.name} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Tooltip content={
+                  <div className="max-w-xs p-2">
+                    <p className="font-semibold mb-2">{metric.description}</p>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {metric.guidance.map((item, idx) => (
+                        <li key={idx} className="text-sm">{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                }>
+                  <label className="text-sm font-medium cursor-help">
+                    {metric.name} ({metric.weight}%)
+                  </label>
+                </Tooltip>
                 <span className="text-sm text-gray-500">
-                  Score: {metricScores[metric.key]}
+                  Score: {metricScores[metric.name] || 0}/100
                 </span>
               </div>
-              <p className="text-sm text-gray-500">{metric.description}</p>
               <Input
-                type="range"
+                type="number"
                 min="0"
                 max="100"
-                value={metricScores[metric.key]}
-                onChange={(e) => handleMetricChange(metric.key, Number(e.target.value))}
+                value={metricScores[metric.name] || ''}
+                onChange={(e) => handleMetricScore(metric.name, Number(e.target.value))}
+                placeholder="Enter score (0-100)"
                 className="w-full"
               />
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Poor</span>
-                <span>Excellent</span>
-              </div>
             </div>
           ))}
         </div>
