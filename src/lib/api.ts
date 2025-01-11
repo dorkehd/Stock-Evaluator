@@ -1,41 +1,38 @@
-const API_KEY = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY;
-const BASE_URL = 'https://www.alphavantage.co/query';
-
 export async function fetchStockData(symbol: string) {
   try {
-    const response = await fetch(
-      `${BASE_URL}?function=OVERVIEW&symbol=${symbol}&apikey=${API_KEY}`
-    );
-    const data = await response.json();
-    return data;
+    // For development, return mock data
+    return {
+      symbol,
+      companyName: 'Mock Company',
+      price: 100,
+      change: 2.5,
+      changePercent: 2.5,
+      marketCap: 1000000000,
+      peRatio: 15,
+      volume: 1000000
+    };
   } catch (error) {
     console.error('Error fetching stock data:', error);
-    throw error;
+    return null;
   }
 }
 
-export async function fetchStockPrice(symbol: string) {
+export async function fetchCompanyProfile(symbol: string) {
   try {
-    const response = await fetch(
-      `${BASE_URL}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEY}`
-    );
-    const data = await response.json();
-    return data;
+    // For development, return mock data
+    return {
+      country: 'US',
+      currency: 'USD',
+      exchange: 'NASDAQ',
+      finnhubIndustry: 'Technology',
+      ipo: '2020-01-01',
+      marketCapitalization: 1000000000,
+      name: 'Mock Company',
+      ticker: symbol,
+      weburl: 'https://example.com'
+    };
   } catch (error) {
-    console.error('Error fetching stock price:', error);
-    throw error;
-  }
-}
-
-export async function fetchFinancialMetrics(symbol: string) {
-  try {
-    const response = await fetch(
-      `${BASE_URL}?function=INCOME_STATEMENT&symbol=${symbol}&apikey=${API_KEY}`
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching financial metrics:', error);
-    throw error;
+    console.error('Error fetching company profile:', error);
+    return null;
   }
 }
