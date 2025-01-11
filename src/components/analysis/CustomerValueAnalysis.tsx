@@ -1,17 +1,14 @@
 import React from 'react';
-import { BaseAnalysis } from './BaseAnalysis';
-import { CUSTOMER_VALUE_METRICS } from '@/constants/metrics';
+import BaseAnalysis from './BaseAnalysis';
+import { customerValueMetrics } from './config/metrics';
+import { AnalysisProps } from './types';
 
-interface Props {
-  onScoreUpdate: (score: number) => void;
-}
+const CustomerValueAnalysis = (props: AnalysisProps) => (
+  <BaseAnalysis
+    title="Customer Value Analysis"
+    metrics={customerValueMetrics}
+    {...props}
+  />
+);
 
-export const CustomerValueAnalysis = ({ onScoreUpdate }: Props) => {
-  return (
-    <BaseAnalysis
-      title="Customer Value Analysis"
-      metrics={CUSTOMER_VALUE_METRICS}
-      onScoreUpdate={onScoreUpdate}
-    />
-  );
-};
+export default CustomerValueAnalysis;
