@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface CompetitionMetric {
+interface Metric {
   name: string;
   description: string;
   weight: number;
@@ -12,32 +12,28 @@ interface CompetitionMetric {
 interface Props {
   score: number;
   onScoreChange: (score: number) => void;
-  competitionData?: {
-    competitors?: string[];
-    marketShare?: number;
-  };
 }
 
-const CompetitionAnalysis = ({ score, onScoreChange, competitionData }: Props) => {
-  const metrics: CompetitionMetric[] = [
+const CompetitionAnalysis = ({ score, onScoreChange }: Props) => {
+  const metrics: Metric[] = [
     {
-      name: 'Competition Intensity',
-      description: 'Evaluate the level of competition in the industry',
+      name: 'Competitive Intensity',
+      description: 'How intense is the competition in the industry?',
       weight: 25
     },
     {
-      name: 'Entry Barriers',
-      description: 'Assess barriers to entry for new competitors',
+      name: 'Barriers to Entry',
+      description: 'How strong are the barriers to entry in the industry?',
       weight: 25
     },
     {
       name: 'Competitive Advantages',
-      description: 'Consider sustainable competitive advantages',
+      description: 'How strong and sustainable are the company\'s competitive advantages?',
       weight: 25
     },
     {
-      name: 'Market Position',
-      description: 'Analyze market share and positioning trends',
+      name: 'Market Position Trend',
+      description: 'Is the company\'s market position improving or declining?',
       weight: 25
     }
   ];
@@ -48,45 +44,30 @@ const CompetitionAnalysis = ({ score, onScoreChange, competitionData }: Props) =
   };
 
   return (
-    <Card className="w-full">
+    <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Competition Analysis</CardTitle>
+        <CardTitle className="flex justify-between items-center">
+          <span>Competition Analysis</span>
+          <span className="text-sm text-gray-500">Weight: 10%</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        {competitionData && (
-          <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <p className="font-medium">Competition Overview:</p>
-            <p>Market Share: {competitionData.marketShare?.toFixed(1)}%</p>
-            {competitionData.competitors && (
-              <div>
-                <p className="font-medium mt-2">Key Competitors:</p>
-                <ul className="list-disc list-inside">
-                  {competitionData.competitors.map((competitor, index) => (
-                    <li key={index}>{competitor}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
         <div className="space-y-6">
           {metrics.map((metric) => (
             <div key={metric.name} className="space-y-2">
-              <Label className="text-base font-semibold">
-                {metric.name} ({metric.weight}%)
+              <Label>
+                <span className="font-medium">{metric.name}</span>
+                <span className="ml-2 text-sm text-gray-500">({metric.weight}%)</span>
               </Label>
-              <p className="text-sm text-gray-500">{metric.description}</p>
-              <div className="flex items-center gap-4">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="Score (0-100)"
-                  onChange={(e) => handleMetricScore(Number(e.target.value), metric.weight)}
-                  className="w-32"
-                />
-                <span className="text-sm text-gray-500">Score out of 100</span>
-              </div>
+              <p className="text-sm text-gray-600 mb-2">{metric.description}</p>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                placeholder="Score (0-100)"
+                className="w-full"
+                onChange={(e) => handleMetricScore(Number(e.target.value), metric.weight)}
+              />
             </div>
           ))}
         </div>

@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface MarketMetric {
+interface Metric {
   name: string;
   description: string;
   weight: number;
@@ -12,32 +12,28 @@ interface MarketMetric {
 interface Props {
   score: number;
   onScoreChange: (score: number) => void;
-  marketData?: {
-    totalMarketSize?: number;
-    growthRate?: number;
-  };
 }
 
-const MarketAnalysis = ({ score, onScoreChange, marketData }: Props) => {
-  const metrics: MarketMetric[] = [
+const MarketAnalysis = ({ score, onScoreChange }: Props) => {
+  const metrics: Metric[] = [
     {
-      name: 'Market Size',
-      description: 'Evaluate the total addressable market (TAM) size',
+      name: 'Total Addressable Market',
+      description: 'How large is the total market opportunity?',
       weight: 30
     },
     {
-      name: 'Growth Rate',
-      description: 'Assess the market\'s current and projected growth rate',
+      name: 'Market Growth Rate',
+      description: 'What is the projected market growth rate?',
       weight: 30
     },
     {
-      name: 'Market Share',
-      description: 'Consider the company\'s potential market share capture',
+      name: 'Market Share Potential',
+      description: 'What market share can the company realistically capture?',
       weight: 20
     },
     {
-      name: 'Market Opportunities',
-      description: 'Analyze potential expansion into adjacent markets',
+      name: 'Adjacent Opportunities',
+      description: 'Are there significant adjacent market opportunities?',
       weight: 20
     }
   ];
@@ -47,45 +43,31 @@ const MarketAnalysis = ({ score, onScoreChange, marketData }: Props) => {
     onScoreChange(weightedScore);
   };
 
-  const formatMarketSize = (size?: number) => {
-    if (!size) return 'N/A';
-    if (size >= 1e12) return `$${(size / 1e12).toFixed(1)}T`;
-    if (size >= 1e9) return `$${(size / 1e9).toFixed(1)}B`;
-    if (size >= 1e6) return `$${(size / 1e6).toFixed(1)}M`;
-    return `$${size.toLocaleString()}`;
-  };
-
   return (
-    <Card className="w-full">
+    <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Market Analysis</CardTitle>
+        <CardTitle className="flex justify-between items-center">
+          <span>Market Analysis</span>
+          <span className="text-sm text-gray-500">Weight: 10%</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        {marketData && (
-          <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <p className="font-medium">Market Metrics:</p>
-            <p>Total Market Size: {formatMarketSize(marketData.totalMarketSize)}</p>
-            <p>Market Growth Rate: {marketData.growthRate?.toFixed(1)}%</p>
-          </div>
-        )}
         <div className="space-y-6">
           {metrics.map((metric) => (
             <div key={metric.name} className="space-y-2">
-              <Label className="text-base font-semibold">
-                {metric.name} ({metric.weight}%)
+              <Label>
+                <span className="font-medium">{metric.name}</span>
+                <span className="ml-2 text-sm text-gray-500">({metric.weight}%)</span>
               </Label>
-              <p className="text-sm text-gray-500">{metric.description}</p>
-              <div className="flex items-center gap-4">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="Score (0-100)"
-                  onChange={(e) => handleMetricScore(Number(e.target.value), metric.weight)}
-                  className="w-32"
-                />
-                <span className="text-sm text-gray-500">Score out of 100</span>
-              </div>
+              <p className="text-sm text-gray-600 mb-2">{metric.description}</p>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                placeholder="Score (0-100)"
+                className="w-full"
+                onChange={(e) => handleMetricScore(Number(e.target.value), metric.weight)}
+              />
             </div>
           ))}
         </div>
